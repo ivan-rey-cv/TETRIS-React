@@ -1,10 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
+
 import MainLayout from './layouts/MainLayout'
 import HeaderLayout from './layouts/HeaderLayout'
-import GameGridLayout from './layouts/GameGridLayout'
+import GameGrid from './components/GameGrid'
 import ActionsLayout from './layouts/ActionsLayout'
 
+import setGrid from './utils/setGrid'
+
+const defaultGrid = setGrid(20, 15)
+
 function App(props) {
+	const [grid, setGrid] = useState(defaultGrid)
+
 	return (
 		<MainLayout>
 			<HeaderLayout>
@@ -12,9 +19,7 @@ function App(props) {
 				<span>300 points</span>
 			</HeaderLayout>
 
-			<GameGridLayout>
-				<span />
-			</GameGridLayout>
+			<GameGrid grid={grid} />
 
 			<ActionsLayout>
 				<span>left</span>

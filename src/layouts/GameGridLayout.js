@@ -10,12 +10,12 @@ const Layout = styled.section`
 	flex: 1;
 `
 const Grid = styled.div`
-	height: 420px;
-	width: 315px;
+	height: 421px;
+	width: 316px;
 
 	display: grid;
-	grid-template-columns: repeat(15, 20px);
-	grid-template-rows: repeat(20, 20px);
+	grid-template-columns: repeat(15, 21px);
+	grid-template-rows: repeat(20, 21px);
 	border: 1px solid lightgray;
 
 	background: repeating-linear-gradient(
