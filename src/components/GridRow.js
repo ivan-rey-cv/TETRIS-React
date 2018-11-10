@@ -13,13 +13,17 @@ const Row = styled.div`
 const Item = styled.span`
 	height: 100%;
 	flex: 1;
+
+	${props => ({
+		backgroundColor: `${props.color ? props.color : 'transparent'}`
+	})};
 `
 
 function GridRow(props) {
 	return (
 		<Row pos={props.pos}>
-			{props.list.map(col => (
-				<Item>{col}</Item>
+			{props.list.map(item => (
+				<Item color={item}>{item}</Item>
 			))}
 		</Row>
 	)

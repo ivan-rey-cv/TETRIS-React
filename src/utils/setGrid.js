@@ -2,9 +2,10 @@ function setGrid(rows, cols) {
 	let grid = []
 	let list = []
 
-	// row = [false, false ...]
+	// row = ['', '' ...]
+	// accepts color strings, eg 'red', to color the grid
 	for (let i = 0; i < cols; i++) {
-		list.push(false)
+		list.push('')
 	}
 
 	for (let i = 0; i < rows; i++) {
