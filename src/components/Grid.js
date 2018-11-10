@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react'
 import GridRow from './GridRow'
 
-function GameGrid(props) {
+function Grid(props) {
+	console.log({ props })
+
 	return (
 		<Fragment>
 			{props.grid.map((row, index) => (
@@ -11,4 +13,4 @@ function GameGrid(props) {
 	)
 }
 
-export default React.memo(GameGrid)
+export default React.memo(Grid)

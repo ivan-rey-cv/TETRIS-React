@@ -12,18 +12,25 @@ const Row = styled.div`
 `
 const Item = styled.span`
 	height: 100%;
-	flex: 1;
+	flex: 1 1 5px;
 
-	${props => ({
-		backgroundColor: `${props.color ? props.color : 'transparent'}`
-	})};
+	${props => {
+		if (props.color !== '') {
+			console.log('cell color', '')
+
+			return {
+				backgroundColor: `${props.color ? props.color : 'transparent'}`
+			}
+		}
+	}};
 `
 
 function GridRow(props) {
+	console.log('row', props.list)
 	return (
 		<Row pos={props.pos}>
 			{props.list.map(item => (
-				<Item color={item}>{item}</Item>
+				<Item color={item} />
 			))}
 		</Row>
 	)

@@ -1,12 +1,8 @@
-function setGrid(rows, cols) {
-	let grid = []
-	let list = []
+import createList from './createList'
 
-	// row = ['', '' ...]
-	// accepts color strings, eg 'red', to color the grid
-	for (let i = 0; i < cols; i++) {
-		list.push('')
-	}
+export default function setGrid(rows, cols) {
+	let grid = []
+	let list = createList(cols, '')
 
 	for (let i = 0; i < rows; i++) {
 		// copy list
@@ -15,5 +11,3 @@ function setGrid(rows, cols) {
 	}
 	return grid
 }
-
-export default setGrid
