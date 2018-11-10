@@ -16,8 +16,6 @@ const Item = styled.span`
 
 	${props => {
 		if (props.color !== '') {
-			console.log('cell color', '')
-
 			return {
 				backgroundColor: `${props.color ? props.color : 'transparent'}`
 			}
@@ -26,11 +24,10 @@ const Item = styled.span`
 `
 
 function GridRow(props) {
-	console.log('row', props.list)
 	return (
 		<Row pos={props.pos}>
-			{props.list.map(item => (
-				<Item color={item} />
+			{props.list.map((item, index) => (
+				<Item color={item} key={`cell-${index}`} />
 			))}
 		</Row>
 	)

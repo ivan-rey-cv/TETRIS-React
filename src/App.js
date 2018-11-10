@@ -9,8 +9,9 @@ import Shape from './components/Shape'
 
 import setGrid from './utils/setGrid'
 import setShape from './utils/setShape'
+import { setInterval } from 'core-js'
 
-// will not be hoisted inside function
+// imported functions will not be hoisted inside function declaration
 // set before calling App function
 const defaultGrid = setGrid(20, 15)
 const defaultPos = { x: 7, y: 1 }
@@ -23,20 +24,68 @@ function App(props) {
 	const [nextShape, setNextShape] = useState(shape_2)
 	const [pos, setPos] = useState(defaultPos)
 
-	useEffect(
-		__ => {
-			setTimeout(_ => {
-				setPos({ x: pos.x, y: pos.y + 1 })
-			}, 750)
-			//
-		},
-		[pos]
-	)
+	const checkCollision = useCallback(__ => {
+		// if bottom shape's array has no <color>, take the middle array instead
+		let hasEmptyBottomArr = currentShape.grid[2].every(x => x === '')
+		let rowIndex = hasEmptyBottomArr ? pos.y + 1 : pos.y + 2,
+			shapeArr,
+			gridArr
+		let lastIndex = 20
 
-	const handleTurn = useCallback(e => {
+		if (hasEmptyBottomArr) {
+			let index = 1
+			shapeArr = currentShape.grid[index]
+			gridArr = grid[pos.y + index]
+
+			if (pos.y + index === lastIndex) {
+				return true
+			}
+		} else {
+			let index = 2
+			shapeArr = currentShape.grid[index]
+			gridArr = grid[pos.y + index]
+
+			if (pos.y + index === lastIndex) {
+				return true
+			}
+		}
+
+		return shapeArr.reduce((hasCollision, item, index) => {
+			if (hasCollision) return hasCollision
+
+			return item && gridArr[pos.x - 1 + index] ? true : false
+		}, false)
+	})
+
+	const descendShape = useCallback(__ => {
+		// *bug/feature* - turning left/right refreshes setTimeout
+		let timer
+		let hasCollided = checkCollision()
+		if (hasCollided) {
+			return // do nothing
+		} else {
+			timer = setTimeout(_ => {
+				setPos({ ...pos, y: pos.y + 1 })
+			}, 750)
+			return () => {
+				clearTimeout(timer)
+			}
+		}
+	})
+	useEffect(descendShape)
+
+	const handleRotate = useCallback(e => {
+		console.log('handleRotate', 'should only rendered once')
+		if (currentShape.name === 'O') {
+			// box shape
+			return // do nothing
+		}
+
 		let shapeGrid = currentShape.grid
 		let newShape = {
 			...currentShape,
+			// turning the grid
+			// there is a pattern, as you can see below
 			grid: [
 				[shapeGrid[2][0], shapeGrid[1][0], shapeGrid[0][0]],
 				[shapeGrid[2][1], shapeGrid[1][1], shapeGrid[0][1]],
@@ -46,25 +95,33 @@ function App(props) {
 		setCurrentShape(newShape)
 	})
 
-	console.log({ grid })
+	const handleTurnRight = useCallback(e => {
+		setPos({ ...pos, x: pos.x + 1 })
+	})
+	const handleTurnLeft = useCallback(e => {
+		setPos({ ...pos, x: pos.x - 1 })
+	})
+
 	return (
 		<MainLayout>
 			<HeaderLayout>
-				<span>next "L"</span>
+				<span>
+					<span>next</span>
+					<span> "{nextShape.name}"</span>
+				</span>
 				<span>300 points</span>
 			</HeaderLayout>
 
 			<GameGridLayout>
 				<Grid grid={grid} />
-				<Shape shape={currentShape.grid} pos={pos} />
+				{pos && <Shape shape={currentShape.grid} pos={pos} />}
 			</GameGridLayout>
 
 			<ActionsLayout>
-				<span>left</span>
-				<span>down</span>
+				<span onClick={handleTurnLeft}>left</span>
 				<span>drop</span>
-				<span>right</span>
-				<span onClick={handleTurn}>turn</span>
+				<span onClick={handleTurnRight}>right</span>
+				<span onClick={handleRotate}>rotate</span>
 			</ActionsLayout>
 		</MainLayout>
 	)

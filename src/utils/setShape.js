@@ -28,6 +28,11 @@ const shapes = [
 			['lightsalmon', 'lightsalmon', ''],
 			['', '', '']
 		]
+	},
+	{
+		name: 'I',
+		color: 'crimson',
+		grid: [['', '', ''], ['crimson', 'crimson', 'crimson'], ['', '', '']]
 	}
 ]
 
