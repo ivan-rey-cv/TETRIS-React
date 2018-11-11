@@ -1,105 +1,128 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 import MainLayout from './layouts/MainLayout'
 import HeaderLayout from './layouts/HeaderLayout'
 import ActionsLayout from './layouts/ActionsLayout'
-import GameGridLayout from './layouts/GameGridLayout'
-import Grid from './components/Grid'
-import Shape from './components/Shape'
+import GameGridLayout from './layouts/CanvasLayout'
 
-import setGrid from './utils/setGrid'
-import setShape from './utils/setShape'
-import { setInterval } from 'core-js'
+import setMatrix from './utils/setMatrix'
+import setTetromino from './utils/setTetromino'
+import renderTetromino from './utils/renderTetromino'
+import drawMatrix from './utils/drawMatrix'
 
-// imported functions will not be hoisted inside function declaration
+// imported functions (like var, let const) will be hoisted after function declaration
 // set before calling App function
-const defaultGrid = setGrid(20, 15)
-const defaultPos = { x: 7, y: 1 }
-const shape_1 = setShape()
-const shape_2 = setShape()
+const defaultMatrix = setMatrix(20, 15)
+const length = 20
+const defaultPos = { x: 6, y: 1 }
+const tetromino_1 = setTetromino()
+const tetromino_2 = setTetromino()
 
 function App(props) {
-	const [grid, setGrid] = useState(defaultGrid)
-	const [currentShape, setCurrentShape] = useState(shape_1)
-	const [nextShape, setNextShape] = useState(shape_2)
+	const [matrix, setMatrix] = useState(defaultMatrix)
+	const [currentTetromino, setCurrentTetromino] = useState(tetromino_1)
+	const [nextTetromino, setNextTetromino] = useState(tetromino_2)
 	const [pos, setPos] = useState(defaultPos)
+	const [ctx, setCtx] = useState(null)
+	let canvas = useRef(null)
 
-	const checkCollision = useCallback(__ => {
-		// if bottom shape's array has no <color>, take the middle array instead
-		let hasEmptyBottomArr = currentShape.grid[2].every(x => x === '')
-		let rowIndex = hasEmptyBottomArr ? pos.y + 1 : pos.y + 2,
-			shapeArr,
-			gridArr
-		let lastIndex = 20
+	const checkCollision = useCallback(newPos => {
+		let hasCollision = currentTetromino.matrix.reduce(
+			(hasCollided, row, rowIndex) => {
+				if (hasCollided) {
+					return hasCollided
+				}
+				row.forEach((cell, cellIndex) => {
+					if (cell === 1) {
+						let matrixRow = newPos.y + rowIndex
+						let matrixCol = newPos.x + cellIndex
+						let outOfBounds =
+							matrixRow > 19 || matrixCol < 0 || matrixCol > 14
 
-		if (hasEmptyBottomArr) {
-			let index = 1
-			shapeArr = currentShape.grid[index]
-			gridArr = grid[pos.y + index]
+						if (outOfBounds) {
+							console.log({ matrixCol, outOfBounds })
+							return (hasCollided = true)
+						} else {
+							let matrixCell = matrix[matrixRow][matrixCol]
+							// has collided if matrixCell contains color string
+							return (hasCollided = matrixCell ? true : false)
+						}
+					}
+				})
+				return hasCollided
+			},
+			false
+		)
+		return hasCollision
+	})
 
-			if (pos.y + index === lastIndex) {
-				return true
-			}
+	const moveTetromino = useCallback((newX, newY) => {
+		let newPos = { x: pos.x + newX, y: pos.y + newY }
+		let hasCollision = checkCollision(newPos)
+		if (hasCollision) {
+			// do nothing
 		} else {
-			let index = 2
-			shapeArr = currentShape.grid[index]
-			gridArr = grid[pos.y + index]
+			renderTetromino(
+				'clear',
+				ctx,
+				currentTetromino,
+				pos.x * length,
+				pos.y * length
+			)
+			renderTetromino(
+				'draw',
+				ctx,
+				currentTetromino,
+				newPos.x * length,
+				newPos.y * length
+			)
+			return setPos(newPos)
+		}
 
-			if (pos.y + index === lastIndex) {
-				return true
+		return //
+	})
+
+	useEffect(
+		e => {
+			if (canvas && !ctx) {
+				console.log('initialize matrix...')
+				let newCtx = canvas.getContext('2d')
+				setCtx(newCtx)
+				drawMatrix(newCtx, matrix, 0, 0)
+			}
+		},
+		[matrix]
+	)
+
+	useEffect(
+		e => {
+			if (ctx) {
+				let timer = setTimeout(_ => {
+					moveTetromino(0, 1)
+				}, 750)
+				return () => {
+					clearTimeout(timer)
+				}
 			}
 		}
+		//[pos]
+	)
 
-		return shapeArr.reduce((hasCollision, item, index) => {
-			if (hasCollision) return hasCollision
-
-			return item && gridArr[pos.x - 1 + index] ? true : false
-		}, false)
+	const handleRotation = useCallback(e => {
+		renderTetromino(
+			'clear',
+			ctx,
+			currentTetromino,
+			pos.x * length,
+			pos.y * length
+		)
+		setCurrentTetromino(currentTetromino.rotate())
 	})
-
-	const descendShape = useCallback(__ => {
-		// *bug/feature* - turning left/right refreshes setTimeout
-		let timer
-		let hasCollided = checkCollision()
-		if (hasCollided) {
-			return // do nothing
-		} else {
-			timer = setTimeout(_ => {
-				setPos({ ...pos, y: pos.y + 1 })
-			}, 750)
-			return () => {
-				clearTimeout(timer)
-			}
-		}
-	})
-	useEffect(descendShape)
-
-	const handleRotate = useCallback(e => {
-		console.log('handleRotate', 'should only rendered once')
-		if (currentShape.name === 'O') {
-			// box shape
-			return // do nothing
-		}
-
-		let shapeGrid = currentShape.grid
-		let newShape = {
-			...currentShape,
-			// turning the grid
-			// there is a pattern, as you can see below
-			grid: [
-				[shapeGrid[2][0], shapeGrid[1][0], shapeGrid[0][0]],
-				[shapeGrid[2][1], shapeGrid[1][1], shapeGrid[0][1]],
-				[shapeGrid[2][2], shapeGrid[1][2], shapeGrid[0][2]]
-			]
-		}
-		setCurrentShape(newShape)
-	})
-
 	const handleTurnRight = useCallback(e => {
-		setPos({ ...pos, x: pos.x + 1 })
+		moveTetromino(1, 0)
 	})
 	const handleTurnLeft = useCallback(e => {
-		setPos({ ...pos, x: pos.x - 1 })
+		moveTetromino(-1, 0)
 	})
 
 	return (
@@ -107,21 +130,20 @@ function App(props) {
 			<HeaderLayout>
 				<span>
 					<span>next</span>
-					<span> "{nextShape.name}"</span>
+					<span> "{nextTetromino.name}"</span>
 				</span>
 				<span>300 points</span>
 			</HeaderLayout>
 
 			<GameGridLayout>
-				<Grid grid={grid} />
-				{pos && <Shape shape={currentShape.grid} pos={pos} />}
+				<canvas ref={e => (canvas = e)} height="400" width="300" />
 			</GameGridLayout>
 
 			<ActionsLayout>
 				<span onClick={handleTurnLeft}>left</span>
 				<span>drop</span>
 				<span onClick={handleTurnRight}>right</span>
-				<span onClick={handleRotate}>rotate</span>
+				<span onClick={handleRotation}>rotate</span>
 			</ActionsLayout>
 		</MainLayout>
 	)

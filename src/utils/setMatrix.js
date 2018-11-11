@@ -1,6 +1,6 @@
 import createList from './createList'
 
-export default function setGrid(rows, cols) {
+export default function setMatrix(rows, cols) {
 	let grid = []
 	let list = createList(cols, '')
 
