@@ -11,7 +11,7 @@ const Layout = styled.section`
 `
 const CanvasContainer = styled.div`
 	height: 400px;
-	width: 300px;
+	width: 320px;
 `
 
 function CanvasLayout(props) {

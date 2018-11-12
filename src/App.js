@@ -6,123 +6,103 @@ import ActionsLayout from './layouts/ActionsLayout'
 import GameGridLayout from './layouts/CanvasLayout'
 
 import setMatrix from './utils/setMatrix'
-import setTetromino from './utils/setTetromino'
-import renderTetromino from './utils/renderTetromino'
-import drawMatrix from './utils/drawMatrix'
+import createList from './utils/createList'
+import paintMatrix from './utils/paintMatrix'
+import { SQ, COLS, ROWS } from './utils/variables'
+import randomTetromino from './utils/randomTetromino'
 
 // imported functions (like var, let const) will be hoisted after function declaration
 // set before calling App function
-const defaultMatrix = setMatrix(20, 15)
-const length = 20
-const defaultPos = { x: 6, y: 1 }
-const tetromino_1 = setTetromino()
-const tetromino_2 = setTetromino()
+const defaultMatrix = setMatrix(ROWS, COLS)
+const tetromino_1 = randomTetromino()
+const tetromino_2 = randomTetromino()
 
 function App(props) {
-	const [matrix, setMatrix] = useState(defaultMatrix)
+	const [board, setBoard] = useState(defaultMatrix)
 	const [currentTetromino, setCurrentTetromino] = useState(tetromino_1)
 	const [nextTetromino, setNextTetromino] = useState(tetromino_2)
-	const [pos, setPos] = useState(defaultPos)
 	const [ctx, setCtx] = useState(null)
 	let canvas = useRef(null)
 
-	const checkCollision = useCallback(newPos => {
-		let hasCollision = currentTetromino.matrix.reduce(
-			(hasCollided, row, rowIndex) => {
-				if (hasCollided) {
-					return hasCollided
-				}
-				row.forEach((cell, cellIndex) => {
-					if (cell === 1) {
-						let matrixRow = newPos.y + rowIndex
-						let matrixCol = newPos.x + cellIndex
-						let outOfBounds =
-							matrixRow > 19 || matrixCol < 0 || matrixCol > 14
-
-						if (outOfBounds) {
-							console.log({ matrixCol, outOfBounds })
-							return (hasCollided = true)
-						} else {
-							let matrixCell = matrix[matrixRow][matrixCol]
-							// has collided if matrixCell contains color string
-							return (hasCollided = matrixCell ? true : false)
-						}
-					}
-				})
-				return hasCollided
-			},
-			false
-		)
-		return hasCollision
-	})
-
-	const moveTetromino = useCallback((newX, newY) => {
-		let newPos = { x: pos.x + newX, y: pos.y + newY }
-		let hasCollision = checkCollision(newPos)
-		if (hasCollision) {
-			// do nothing
-		} else {
-			renderTetromino(
-				'clear',
-				ctx,
-				currentTetromino,
-				pos.x * length,
-				pos.y * length
-			)
-			renderTetromino(
-				'draw',
-				ctx,
-				currentTetromino,
-				newPos.x * length,
-				newPos.y * length
-			)
-			return setPos(newPos)
-		}
-
-		return //
-	})
-
 	useEffect(
 		e => {
-			if (canvas && !ctx) {
+			if (canvas) {
 				console.log('initialize matrix...')
 				let newCtx = canvas.getContext('2d')
 				setCtx(newCtx)
-				drawMatrix(newCtx, matrix, 0, 0)
+				paintMatrix('drawBoard', newCtx, board, 0, 0)
 			}
 		},
-		[matrix]
+		[board]
 	)
+
+	const lockTetrominoToBoard = useCallback(() => {
+		let pos_x = currentTetromino.pos_x
+		let pos_y = currentTetromino.pos_y
+		currentTetromino.matrix.forEach((row, rowIndex) => {
+			row.forEach((cellItem, cellIndex) => {
+				if (cellItem === 1) {
+					// mutate board
+					// board's cell as currentTetromino.color
+					board[pos_y + rowIndex][pos_x + cellIndex] =
+						currentTetromino.color
+				}
+			})
+		})
+	})
+
+	const removeFilledRows = useCallback(() => {
+		const filteredBoard = board.filter(row => row.every(cell => cell))
+		let count = board.length - filteredBoard.length
+		if (count > 0) {
+			let emptyLists = []
+			for (let i = 0; i < count; i++) {
+				let list = createList(COLS, '')
+				emptyLists.push(list)
+			}
+			setBoard([...emptyLists, ...filteredBoard])
+		} else {
+			setBoard(board)
+		}
+		//
+	})
 
 	useEffect(
 		e => {
 			if (ctx) {
-				let timer = setTimeout(_ => {
-					moveTetromino(0, 1)
+				currentTetromino.paint('draw', ctx)
+				console.log('set interval')
+				setBoard(board)
+				let timer = setInterval(_ => {
+					let hasCollided = currentTetromino.down(ctx, board)
+
+					if (hasCollided) {
+						lockTetrominoToBoard()
+						removeFilledRows()
+						setCurrentTetromino(nextTetromino)
+						setNextTetromino(randomTetromino())
+					}
 				}, 750)
 				return () => {
 					clearTimeout(timer)
 				}
 			}
-		}
-		//[pos]
+		},
+		[board, ctx]
 	)
 
 	const handleRotation = useCallback(e => {
-		renderTetromino(
-			'clear',
-			ctx,
-			currentTetromino,
-			pos.x * length,
-			pos.y * length
-		)
-		setCurrentTetromino(currentTetromino.rotate())
+		currentTetromino.rotate(ctx, board)
+	})
+
+	const handleTurnLeft = useCallback(e => {
+		currentTetromino.move(-1, 0, ctx, board)
 	})
 	const handleTurnRight = useCallback(e => {
-		moveTetromino(1, 0)
+		currentTetromino.move(1, 0, ctx, board)
 	})
-	const handleTurnLeft = useCallback(e => {
-		moveTetromino(-1, 0)
+	const handleDown = useCallback(e => {
+		currentTetromino.move(0, 1, ctx, board)
 	})
 
 	return (
@@ -136,12 +116,16 @@ function App(props) {
 			</HeaderLayout>
 
 			<GameGridLayout>
-				<canvas ref={e => (canvas = e)} height="400" width="300" />
+				<canvas
+					ref={e => (canvas = e)}
+					height={ROWS * SQ}
+					width={COLS * SQ}
+				/>
 			</GameGridLayout>
 
 			<ActionsLayout>
 				<span onClick={handleTurnLeft}>left</span>
-				<span>drop</span>
+				<span onClick={handleDown}>down</span>
 				<span onClick={handleTurnRight}>right</span>
 				<span onClick={handleRotation}>rotate</span>
 			</ActionsLayout>
