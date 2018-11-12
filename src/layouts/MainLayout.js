@@ -13,7 +13,7 @@ const Main = styled.main`
 `
 
 function MainLayout(props) {
-	return <Main>{props.children}</Main>
+	return <Main {...props}>{props.children}</Main>
 }
 
 export default React.memo(MainLayout)

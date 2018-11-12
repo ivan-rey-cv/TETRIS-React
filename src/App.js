@@ -54,6 +54,11 @@ function App(props) {
 		[store.pos_y]
 	)
 
+	const handleArrowkeys = useCallback(e => {
+		// todo: handle arrow keys
+		console.log(e)
+	})
+
 	const handleRotation = useCallback(e => {
 		dispatch({ type: 'ROTATE' })
 	})
@@ -68,7 +73,7 @@ function App(props) {
 	})
 
 	return (
-		<MainLayout>
+		<MainLayout onKeyPress={handleArrowkeys}>
 			<HeaderLayout>
 				<span>
 					<span>next</span>
