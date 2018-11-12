@@ -1,1 +1,1 @@
-# IDLE game with React and Hooks API
+# TETRIS game with React and Hooks API
