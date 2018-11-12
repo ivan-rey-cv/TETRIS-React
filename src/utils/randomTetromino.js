@@ -1,5 +1,4 @@
 import randomNumber from './randomNumber'
-import Shape from './Shape'
 const tetrominoes = [
 	{
 		size: 3,
@@ -48,8 +47,5 @@ const tetrominoes = [
 
 export default function randomTetromino() {
 	let randomIndex = randomNumber(0, tetrominoes.length)
-	let tetromino = tetrominoes[randomIndex]
-	// random pos_x
-	let defaultPos = { pos_x: 3 + randomIndex, pos_y: 3 }
-	return new Shape({ ...tetromino, ...defaultPos })
+	return tetrominoes[randomIndex]
 }
