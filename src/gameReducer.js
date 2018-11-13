@@ -1,5 +1,6 @@
-import { SQ, COLS, ROWS } from './utils/variables'
 import paintMatrix from './utils/paintMatrix'
+import randomNumber from './utils/randomNumber'
+import { SQ, COLS, ROWS } from './utils/variables'
 import checkCollision from './utils/checkCollision'
 import getNextRotation from './utils/getNextRotation'
 import randomTetromino from './utils/randomTetromino'
@@ -8,6 +9,10 @@ import lockTetrominoToBoard from './utils/lockTetrominoToBoard'
 
 function gameReducer(state, action) {
 	switch (action.type) {
+		case 'START_GAME': {
+			return { ...state, inGame: true, isGameOver: false }
+		}
+
 		case 'INIT_CTX': {
 			return { ...state, ctx: action.ctx }
 		}
@@ -15,7 +20,7 @@ function gameReducer(state, action) {
 		case 'DRAW_BOARD': {
 			const { ctx, board, pos_x, pos_y } = state
 			ctx.clearRect(0, 0, COLS * SQ, ROWS * SQ)
-			paintMatrix('drawBoard', ctx, board, pos_x, pos_y)
+			paintMatrix('drawBoard', ctx, board, 0, 0)
 			return state
 		}
 
@@ -28,11 +33,16 @@ function gameReducer(state, action) {
 			let hasCollision = checkCollision(coord_x, coord_y, matrix, board)
 
 			if (hasCollision) {
-				console.log('has collided!')
 				paintMatrix('draw', ctx, matrix, pos_x, pos_y, color)
-
 				// direction: down
 				if (newPos_y >= 1) {
+					let inGame = state.inGame
+					let isGameOver = state.isGameOver
+					if (pos_y < 0) {
+						inGame = false
+						isGameOver = true
+					}
+
 					const mutatedBoard = lockTetrominoToBoard(
 						currentTetromino,
 						board,
@@ -42,10 +52,13 @@ function gameReducer(state, action) {
 					const { newBoard, points } = removeFilledRows(mutatedBoard)
 					const newerTetromino = randomTetromino()
 					return {
+						...state,
+						inGame,
+						isGameOver,
 						points: state.points + points,
 						ctx: state.ctx,
-						pos_x: 0,
-						pos_y: 0,
+						pos_x: 2 + randomNumber(0, COLS / 2),
+						pos_y: -1,
 						board: [...newBoard],
 						currentTetromino: state.nextTetromino,
 						nextTetromino: newerTetromino

@@ -19,6 +19,6 @@ export default function removeFilledRows(board) {
 
 	return {
 		newBoard,
-		points: count * 50
+		points: count > 0 ? Math.floor(Math.pow(1.1, count) * 50) : 0
 	}
 }

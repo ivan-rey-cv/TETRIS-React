@@ -54,14 +54,14 @@ const actions = [
 		action: 'handleDown'
 	},
 	{
-		name: 'right',
-		svg: rightSVG,
-		action: 'handleRight'
-	},
-	{
 		name: 'rotate',
 		svg: rotateSVG,
 		action: 'handleRotate'
+	},
+	{
+		name: 'right',
+		svg: rightSVG,
+		action: 'handleRight'
 	}
 ]
 function GameActions(props) {

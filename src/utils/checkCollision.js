@@ -12,7 +12,10 @@ export default function checkCollision(newPos_x, newPos_y, matrix, board) {
 				let matrixCol = newPos_x + cellIndex
 
 				let outOfBounds =
-					matrixRow >= ROWS || matrixCol < 0 || matrixCol >= COLS
+					matrixRow < 0 ||
+					matrixRow >= ROWS ||
+					matrixCol < 0 ||
+					matrixCol >= COLS
 
 				if (outOfBounds) {
 					return (hasCollided = true)

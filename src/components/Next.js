@@ -36,7 +36,6 @@ const Wrapper = styled.span`
 `
 
 function Next(props) {
-	console.log(props)
 	return (
 		<Wrapper>
 			<span>NEXT</span>

@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout'
 import HeaderLayout from './layouts/HeaderLayout'
 import GameGridLayout from './layouts/CanvasLayout'
 import GameActions from './components/GameActions'
+import Modal from './components/Modal'
 import Points from './components/Points'
 import Next from './components/Next'
 
@@ -11,12 +12,15 @@ import gameReducer from './gameReducer'
 import setMatrix from './utils/setMatrix'
 import { SQ, COLS, ROWS } from './utils/variables'
 import randomTetromino from './utils/randomTetromino'
+import randomNumber from './utils/randomNumber'
 
 const defaultState = {
+	isGameOver: false,
+	inGame: false,
 	points: 0,
 	ctx: null,
-	pos_x: 0,
-	pos_y: 0,
+	pos_x: 2 + randomNumber(0, COLS / 2),
+	pos_y: -1,
 	board: setMatrix(ROWS, COLS),
 	nextTetromino: randomTetromino(),
 	currentTetromino: randomTetromino()
@@ -41,24 +45,23 @@ function App(props) {
 		[store.board]
 	)
 
-	useEffect(
-		e => {
-			if (store.ctx) {
-				let timer = setInterval(() => {
-					dispatch({ type: 'MOVE', newPos_x: 0, newPos_y: 1 })
-				}, 750)
-				return () => {
-					clearTimeout(timer)
-				}
+	useEffect(e => {
+		if (store.ctx && store.inGame) {
+			let delay = 600
+			let timer = setInterval(() => {
+				dispatch({ type: 'MOVE', newPos_x: 0, newPos_y: 1 })
+			}, delay)
+			return () => {
+				clearTimeout(timer)
 			}
-		},
-		// remove this to work
-		[store.pos_y]
-	)
+		}
+	})
 
 	const handleArrowkeys = useCallback(e => {
 		// todo: handle arrow keys
-		console.log(e)
+	})
+	const handleStartGame = useCallback(e => {
+		dispatch({ type: 'START_GAME' })
 	})
 
 	const handleRotate = useCallback(e => {
@@ -78,7 +81,6 @@ function App(props) {
 		<MainLayout onKeyPress={handleArrowkeys}>
 			<HeaderLayout>
 				<Next tetromino={store.nextTetromino} />
-
 				<Points points={store.points} />
 			</HeaderLayout>
 
@@ -96,6 +98,12 @@ function App(props) {
 				handleDown={handleDown}
 				handleRotate={handleRotate}
 			/>
+
+			{!store.inGame && (
+				<Modal handleStartGame={handleStartGame}>
+					{store.isGameOver && <Points points={store.points} />}
+				</Modal>
+			)}
 		</MainLayout>
 	)
 }
