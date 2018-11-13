@@ -10,12 +10,6 @@ const Layout = styled.div`
 
 	display: flex;
 	justify-content: space-around;
-
-	span {
-		cursor: pointer;
-		padding: 0.25rem;
-		background-color: lightgray;
-	}
 `
 
 function ActionsLayout(props) {

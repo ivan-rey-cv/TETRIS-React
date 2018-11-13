@@ -2,8 +2,10 @@ import React, { useReducer, useEffect, useCallback, useRef } from 'react'
 
 import MainLayout from './layouts/MainLayout'
 import HeaderLayout from './layouts/HeaderLayout'
-import ActionsLayout from './layouts/ActionsLayout'
 import GameGridLayout from './layouts/CanvasLayout'
+import GameActions from './components/GameActions'
+import Points from './components/Points'
+import Next from './components/Next'
 
 import gameReducer from './gameReducer'
 import setMatrix from './utils/setMatrix'
@@ -59,13 +61,13 @@ function App(props) {
 		console.log(e)
 	})
 
-	const handleRotation = useCallback(e => {
+	const handleRotate = useCallback(e => {
 		dispatch({ type: 'ROTATE' })
 	})
-	const handleTurnLeft = useCallback(e => {
+	const handleLeft = useCallback(e => {
 		dispatch({ type: 'MOVE', newPos_x: -1, newPos_y: 0 })
 	})
-	const handleTurnRight = useCallback(e => {
+	const handleRight = useCallback(e => {
 		dispatch({ type: 'MOVE', newPos_x: 1, newPos_y: 0 })
 	})
 	const handleDown = useCallback(e => {
@@ -75,11 +77,9 @@ function App(props) {
 	return (
 		<MainLayout onKeyPress={handleArrowkeys}>
 			<HeaderLayout>
-				<span>
-					<span>next</span>
-					<span> "{store.nextTetromino.name}"</span>
-				</span>
-				<span>{store.points} points</span>
+				<Next tetromino={store.nextTetromino} />
+
+				<Points points={store.points} />
 			</HeaderLayout>
 
 			<GameGridLayout>
@@ -90,12 +90,12 @@ function App(props) {
 				/>
 			</GameGridLayout>
 
-			<ActionsLayout>
-				<span onClick={handleTurnLeft}>left</span>
-				<span onClick={handleDown}>down</span>
-				<span onClick={handleTurnRight}>right</span>
-				<span onClick={handleRotation}>rotate</span>
-			</ActionsLayout>
+			<GameActions
+				handleLeft={handleLeft}
+				handleRight={handleRight}
+				handleDown={handleDown}
+				handleRotate={handleRotate}
+			/>
 		</MainLayout>
 	)
 }
