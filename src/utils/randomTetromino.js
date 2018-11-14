@@ -39,15 +39,26 @@ const tetrominoes = [
 ]
 
 const colors = [
-	'teal',
-	'crimson',
-	'blue',
-	'green',
-	'yellow',
-	'orange',
-	'purple',
-	'hotpink',
-	'tomato'
+	'#C364C5',
+	'#17806D',
+	'#CB4154',
+	'#76FF7A',
+	'#FFBD88',
+	'#FF6E4A',
+	'#0D98BA',
+	'#FF5349',
+	'#7851A9',
+	'#FFCF48',
+	'#A8E4A0',
+	'#1A4876',
+	'#FEFE22',
+	'#FF2B2B',
+	'#FFA089',
+	'#FF43A4',
+	'#6E5160',
+	'#FF8243',
+	'#CA3767',
+	'#BC5D58'
 ]
 
 export default function randomTetromino() {
