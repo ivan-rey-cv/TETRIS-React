@@ -1,4 +1,5 @@
 import React from 'react'
+import Points from './Points'
 
 import styled from 'styled-components'
 const Overlay = styled.section`
@@ -24,6 +25,9 @@ const ModalWrapper = styled.div`
 const Display = styled.div`
 	font-weight: 600;
 	padding: 0.5rem 2rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 
 	h1 {
 		font-size: 2rem;
@@ -33,6 +37,10 @@ const Display = styled.div`
 		font-size: 200%;
 		margin-top: 1rem;
 		margin-bottom: 2rem;
+
+		> ul {
+			font-size: 0.9rem;
+		}
 	}
 `
 const ButtonDiv = styled.div`
@@ -47,7 +55,7 @@ const ButtonDiv = styled.div`
 	cursor: pointer;
 
 	:hover {
-		opacity: 0.8;
+		box-shadow: 2px 2px 8px black;
 	}
 	:active {
 		transform: scale(0.95);
@@ -60,10 +68,24 @@ function Modal(props) {
 			<ModalWrapper>
 				<Display>
 					<h1>REACT TETRIS</h1>
-					<article>{props.children}</article>
+					<article>
+						{props.isGameOver ? (
+							<Points points={props.points} />
+						) : (
+							<ul>
+								<li>
+									<h4>Keyboard actions:</h4>
+								</li>
+								<li>left-arrow - turn left </li>
+								<li>right-arrow - turn right </li>
+								<li>down-arrow - down </li>
+								<li>up-arrow - rotate </li>
+							</ul>
+						)}
+					</article>
 				</Display>
 				<ButtonDiv onClick={props.handleStartGame}>
-					Start Game
+					{props.isGameOver ? 'New Game' : 'Start Game'}
 				</ButtonDiv>
 			</ModalWrapper>
 		</Overlay>
