@@ -68,33 +68,35 @@ const Div = styled.div`
 function ActionDiv(props) {
 	const { SVG, value } = props
 	const [timer, setTimer] = useState(null)
-	let handlePointerDown, handlePointerUp
+	const [delay, setDelay] = useState(0)
+	let handeMouseDown, handleMouseExit
 
 	if (props.uncontinuous) {
 		// for rotate and pause/unpause
-		handlePointerDown = props.event
-		handlePointerUp = useCallback(_ => {
+		handeMouseDown = props.event
+		handleMouseExit = useCallback(_ => {
 			/* do nothing*/
 		})
 	} else {
-		handlePointerDown = useCallback(e => {
-			props.event(e)
-			let timer = setInterval(() => {
+		handeMouseDown = useCallback(e => {
+			let newTimer = setInterval(() => {
 				props.event(e)
-			}, 75)
-			setTimer(timer)
+			}, 150)
+			setTimer(newTimer)
 		})
 
-		handlePointerUp = useCallback(e => {
+		handleMouseExit = useCallback(e => {
 			clearInterval(timer)
-			setTimer(null)
+			setDelay(0)
 		})
 	}
 
 	return (
 		<Div
-			onPointerDown={handlePointerDown}
-			onPointerUp={handlePointerUp}
+			onMouseDown={handeMouseDown}
+			onMouseUp={handleMouseExit}
+			onMouseLeave={handleMouseExit}
+			onMouseOut={handleMouseExit}
 			className={`${props.reversed ? 'reversed' : ''} ${
 				props.isPaused ? 'paused' : ''
 			}`}
