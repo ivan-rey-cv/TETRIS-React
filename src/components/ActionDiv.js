@@ -97,6 +97,11 @@ function ActionDiv(props) {
 			onMouseUp={handleMouseExit}
 			onMouseLeave={handleMouseExit}
 			onMouseOut={handleMouseExit}
+			// for devices
+			onTouchStart={handeMouseDown}
+			onTouchCancel={handleMouseExit}
+			onTouchEnd={handleMouseExit}
+			//
 			className={`${props.reversed ? 'reversed' : ''} ${
 				props.isPaused ? 'paused' : ''
 			}`}
