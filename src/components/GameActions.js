@@ -1,10 +1,11 @@
 import React from 'react'
 import ActionsLayout from '../layouts/ActionsLayout'
 
-import { ReactComponent as rightSVG } from '../icons/arrowRight.svg'
-import { ReactComponent as leftSVG } from '../icons/arrowLeft.svg'
-import { ReactComponent as downSVG } from '../icons/arrowDown.svg'
-import { ReactComponent as rotateSVG } from '../icons/rotate.svg'
+import { ReactComponent as PauseSVG } from '../icons/pause.svg'
+import { ReactComponent as RightSVG } from '../icons/arrowRight.svg'
+import { ReactComponent as LeftSVG } from '../icons/arrowLeft.svg'
+import { ReactComponent as DownSVG } from '../icons/arrowDown.svg'
+import { ReactComponent as RotateSVG } from '../icons/rotate.svg'
 
 import styled from 'styled-components'
 const Div = styled.div`
@@ -16,22 +17,14 @@ const Div = styled.div`
 	font-size: 0.8rem;
 	font-weight: 600;
 	letter-spacing: 1px;
-	padding: 0.25rem;
-	height: 3rem;
-	width: 3.5rem;
+	padding: 0.5rem;
+	height: 4rem;
+	width: 4rem;
 	background-color: whitesmoke;
 	cursor: pointer;
 	user-select: none;
 
-	:hover {
-		background-color: lightblue;
-	}
-	:active {
-		transform: scale(0.95);
-	}
-
 	svg {
-		fill: purple;
 		height: 1.25rem;
 		width: 1.3rem;
 	}
@@ -40,35 +33,83 @@ const Div = styled.div`
 		background-color: none;
 		color: #606060;
 	}
+
+	&:not(.paused) {
+		:hover {
+			background-color: lightblue;
+		}
+		:active {
+			transform: scale(0.95);
+		}
+
+		svg {
+			fill: purple;
+		}
+	}
+
+	&.paused {
+		svg {
+			fill: #bca2bc;
+		}
+	}
+
+	&.reversed {
+		svg {
+			fill: #bca2bc;
+		}
+		:hover {
+			background-color: lightblue;
+		}
+		:active {
+			transform: scale(0.95);
+		}
+
+		&.paused {
+			svg {
+				fill: purple;
+			}
+		}
+	}
 `
 
 const actions = [
 	{
 		name: 'left',
-		svg: leftSVG,
+		svg: LeftSVG,
 		action: 'handleLeft'
 	},
 	{
 		name: 'down',
-		svg: downSVG,
+		svg: DownSVG,
 		action: 'handleDown'
 	},
 	{
 		name: 'rotate',
-		svg: rotateSVG,
+		svg: RotateSVG,
 		action: 'handleRotate'
 	},
 	{
 		name: 'right',
-		svg: rightSVG,
+		svg: RightSVG,
 		action: 'handleRight'
 	}
 ]
 function GameActions(props) {
 	return (
 		<ActionsLayout>
+			<Div
+				onClick={props.togglePause}
+				className={`${props.isPaused ? 'paused' : ''} reversed`}
+			>
+				<PauseSVG />
+				<span>{props.isPaused ? 'unpause' : 'pause'}</span>
+			</Div>
 			{actions.map((action, index) => (
-				<Div key={action.name} onClick={props[action.action]}>
+				<Div
+					key={action.name}
+					onClick={props[action.action]}
+					className={props.isPaused ? 'paused' : ''}
+				>
 					{<action.svg />}
 					<span>{action.name}</span>
 				</Div>

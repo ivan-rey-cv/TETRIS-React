@@ -40,7 +40,7 @@ function App(props) {
 				the tetromino stays on the same spot and postpones going down
 		*/
 		e => {
-			if (store.ctx && store.inGame) {
+			if (store.ctx && store.inGame && !store.isPaused) {
 				let delay = 600
 				let timer = setTimeout(() => {
 					dispatch({ type: 'MOVE', newPos_x: 0, newPos_y: 1 })
@@ -55,6 +55,9 @@ function App(props) {
 
 	const handleKeyPress = useCallback(e => {
 		switch (e.code) {
+			case 'KeyP': {
+				return dispatch({ type: 'TOGGLE_PAUSE' })
+			}
 			case 'ArrowLeft': {
 				return dispatch({ type: 'MOVE', newPos_x: -1, newPos_y: 0 })
 			}
@@ -88,6 +91,9 @@ function App(props) {
 			dispatch({ type: 'MOVE', newPos_x: 0, newPos_y: 1 })
 		}, 500)
 	}, [])
+	const togglePause = useCallback(e => {
+		dispatch({ type: 'TOGGLE_PAUSE' })
+	}, [])
 	const handleRotate = useCallback(e => {
 		dispatch({ type: 'ROTATE' })
 	}, [])
@@ -117,6 +123,8 @@ function App(props) {
 			</GameGridLayout>
 
 			<GameActions
+				isPaused={store.isPaused}
+				togglePause={togglePause}
 				handleLeft={handleLeft}
 				handleRight={handleRight}
 				handleDown={handleDown}

@@ -18,6 +18,15 @@ function gameReducer(state, action) {
 			}
 		}
 
+		case 'TOGGLE_PAUSE': {
+			const { pos_y, isPaused: prevPauseState } = state
+			if (prevPauseState) {
+				return { ...state, isPaused: false, pos_y: pos_y + 1 }
+			} else {
+				return { ...state, isPaused: true, pos_y: pos_y - 1 }
+			}
+		}
+
 		case 'INIT_CTX': {
 			return { ...state, ctx: action.ctx }
 		}
@@ -30,6 +39,10 @@ function gameReducer(state, action) {
 		}
 
 		case 'MOVE': {
+			if (state.isPaused) {
+				return state
+			}
+
 			const { newPos_x, newPos_y } = action
 			const { ctx, pos_x, pos_y, board, currentTetromino } = state
 			const { matrix, color } = currentTetromino
@@ -79,6 +92,10 @@ function gameReducer(state, action) {
 		}
 
 		case 'ROTATE': {
+			if (state.isPaused) {
+				return state
+			}
+
 			const { board, currentTetromino, pos_x, pos_y, ctx } = state
 			const { matrix, color } = currentTetromino
 			let nextRotation = getNextRotation(currentTetromino)

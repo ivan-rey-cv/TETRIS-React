@@ -5,6 +5,7 @@ import randomNumber from './utils/randomNumber'
 
 function setDefaultState() {
 	return {
+		isPaused: false,
 		isGameOver: false,
 		inGame: false,
 		points: 0,

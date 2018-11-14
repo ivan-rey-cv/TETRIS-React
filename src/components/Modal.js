@@ -40,6 +40,7 @@ const Display = styled.div`
 
 		> ul {
 			font-size: 0.9rem;
+			text-align: center;
 		}
 	}
 `
@@ -74,8 +75,9 @@ function Modal(props) {
 						) : (
 							<ul>
 								<li>
-									<h4>Keyboard actions:</h4>
+									<h3>Keyboard actions:</h3>
 								</li>
+								<li> p - toggle pause </li>
 								<li>left-arrow - turn left </li>
 								<li>right-arrow - turn right </li>
 								<li>down-arrow - down </li>
