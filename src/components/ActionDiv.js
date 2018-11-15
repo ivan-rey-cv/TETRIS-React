@@ -67,41 +67,12 @@ const Div = styled.div`
 
 function ActionDiv(props) {
 	const { SVG, value } = props
-	const [timer, setTimer] = useState(null)
-	const [delay, setDelay] = useState(0)
-	let handeMouseDown, handleMouseExit
-
-	if (props.uncontinuous) {
-		// for rotate and pause/unpause
-		handeMouseDown = props.event
-		handleMouseExit = useCallback(_ => {
-			/* do nothing*/
-		})
-	} else {
-		handeMouseDown = useCallback(e => {
-			let newTimer = setInterval(() => {
-				props.event(e)
-			}, 150)
-			setTimer(newTimer)
-		})
-
-		handleMouseExit = useCallback(e => {
-			clearInterval(timer)
-			setDelay(0)
-		})
-	}
 
 	return (
 		<Div
-			onMouseDown={handeMouseDown}
-			onMouseUp={handleMouseExit}
-			onMouseLeave={handleMouseExit}
-			onMouseOut={handleMouseExit}
-			// for devices
-			onTouchStart={handeMouseDown}
-			onTouchCancel={handleMouseExit}
-			onTouchEnd={handleMouseExit}
-			//
+			// remove long press implementation
+			// TODO: working long press event
+			onClick={props.event}
 			className={`${props.reversed ? 'reversed' : ''} ${
 				props.isPaused ? 'paused' : ''
 			}`}
